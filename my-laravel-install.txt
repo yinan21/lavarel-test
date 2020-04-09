@@ -1,0 +1,42 @@
+1.Prepare 
+sudo apt-get update 
+sudo apt-get upgrade
+
+2.Installing Apache and PHP 7.2
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-get update
+sudo apt-get install apache2 libapache2-mod-php7.2 php7.2 php7.2-xml php7.2-gd php7.2-opcache php7.2-mbstring
+
+3. Installing Laravel
+
+cd /tmp
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+
+cd /var/www/html
+sudo composer create-project laravel/laravel testcase --prefer-dist
+
+4. Configuring Apache
+sudo chgrp -R www-data /var/www/html/testcase
+sudo chmod -R 775 /var/www/html/testcase/storage
+cd /etc/apache2/sites-available
+sudo nano laravel.conf
+<VirtualHost *:80>
+    ServerName localhost.com
+
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/testcase/public
+
+    <Directory /var/www/html/testcase>
+        AllowOverride All
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+sudo a2dissite 000-default.conf
+sudo a2ensite laravel.conf
+sudo a2enmod rewrite
+sudo service apache2 restart
+
+5. On browser: localhost.com
